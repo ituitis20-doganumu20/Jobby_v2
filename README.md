@@ -20,7 +20,7 @@ An intelligent job hunting assistant that utilizes AI to help you find opportuni
 ### Frontend
 - **Streamlit**: Modern web application framework for Python
 - **HTML/CSS**: Custom styling and layout
-- **JavaScript**: Interactive components (if needed)
+
 
 ## 📋 Prerequisites
 
@@ -29,7 +29,6 @@ Before running this project, make sure you have:
 - Python 3.8 or higher installed
 - Google Gemini API key
 - Chrome/Chromium browser (for Selenium)
-- ChromeDriver (will be handled automatically by webdriver-manager)
 
 ## 🚀 Installation
 
@@ -51,16 +50,6 @@ Before running this project, make sure you have:
    ```
 
 ## 📦 Project Structure
-
-
-jobby/
-├── backend/                 # Python and Selenium backend
-├── frontend/                # Streamlit frontend
-├── llm/                     # Gemini API integration
-├── data/                    # Data and templates
-├── requirements.txt         # Python dependencies
-└── README.md               # This file
-```
 
 ## 🎯 Usage
 
