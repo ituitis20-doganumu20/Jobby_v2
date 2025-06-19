@@ -1,0 +1,64 @@
+{
+  "selectedTemplate": "...",
+  "headings": {
+    "education": "Education",
+    "projects": "Projects",
+    "awards": "Digital Credentials and Certifications",
+    "work": "Work Experience",
+    "skills": "Skills"
+  },
+  "basics": {
+    "name": "...",
+    "email": "...",
+    "location": {
+      "address": "..."
+    },
+    "phone": "...",
+    "website": "..."
+  },
+  "education": [
+    {
+      "location": "...",
+      "studyType": "...",
+      "gpa": "...",
+      "institution": "...",
+      "startDate": "...",
+      "endDate": "..."
+    }
+  ],
+  "work": [
+    {
+      "website": "...",
+      "endDate": "...",
+      "highlights": ["..."],
+      "company": "...",
+      "position": "...",
+      "location": "...",
+      "startDate": "..."
+    }
+  ],
+  "skills": [
+    {
+      "name": "...",
+      "level": "...",
+      "keywords": ["..."]
+    }
+  ],
+  "projects": [
+    {
+      "url": "...",
+      "keywords": ["..."],
+      "name": "...",
+      "description": "..."
+    }
+  ],
+  "awards": [
+    {
+      "awarder": "...",
+      "summary": "...",
+      "title": "...",
+      "date": "..."
+    }
+  ],
+  "sections": ["..."]
+}

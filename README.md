@@ -21,7 +21,6 @@ An intelligent job hunting assistant that utilizes AI to help you find opportuni
 - **Streamlit**: Modern web application framework for Python
 - **HTML/CSS**: Custom styling and layout
 
-
 ## 📋 Prerequisites
 
 Before running this project, make sure you have:
