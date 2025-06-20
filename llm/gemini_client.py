@@ -12,8 +12,13 @@ if not GEMINI_API_KEY:
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-def generate_gemini_response(prompt: str) -> str:
-    model = genai.GenerativeModel("models/gemini-2.0-flash-exp")
-    response = model.generate_content(prompt)
-    return response.text
+class Llm:
+    def __init__(self):
+        
+        self.model = genai.GenerativeModel("models/gemini-2.0-flash-exp")
+
+    def generate_gemini_response(self,prompt: str) -> str:
+
+        response = self.model.generate_content(prompt)
+        return response.text
 
