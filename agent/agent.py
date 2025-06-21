@@ -4,21 +4,36 @@ import os
 # Add the project root (one level up) to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import llm.gemini_client as llm
-import backend_tools.web_scrapping.linkedIn_scrapping as linkedInScraper
-
+from backend_tools.web_scrapping.linkedIn_scrapping import linkedInDriver
+from backend_tools.web_scrapping.driver import Driver
 class Agent:
 
-    def __init__(self,url):
+    def __init__(self):
 
-        self.driver= linkedInScraper.Driver(url)
+        self.driver= None
         self.llm=llm.Llm()
 
-    def retreive(self):
+    def specifyWebsite(self,driver_type):
+         if driver_type == "linkedIn":
+            self.driver = linkedInDriver()
+       # elif driver_type == "xing":
+           # self.driver = xingDriver()
 
-        response=self.llm.generate_gemini_response("Hi")
+    def linkedInGetJobTitles(self,jobTitle):
+        self.driver.insertJobTitle(jobTitle)
+        self.driver.getJobsPage()
+        titles=self.driver.getJobtitles()
+
+        response=self.llm.generate_gemini_response("Extract job titles from this list"+' '.join(titles))
+        print(response)
+    def linkedInGetCompanyNamesURL(self):
+        html=self.driver.getHTML()
+        response=self.llm.generate_gemini_response("Extract each company name and its url from this html code"+html)
         print(response)
         
 agent=Agent()
-agent.retreive()
+agent.specifyWebsite("linkedIn")
+agent.linkedInGetJobTitles("python developer")
+agent.linkedInGetCompanyNamesURL()
 
 

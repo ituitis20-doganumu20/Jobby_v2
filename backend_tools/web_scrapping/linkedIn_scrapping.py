@@ -5,18 +5,26 @@ from selenium.webdriver.support.ui import WebDriverWait
 import undetected_chromedriver as uc
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+import sys
+import os
 
+# Add the project root (one level up) to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from backend_tools.web_scrapping.driver import Driver
 
-class Driver:
+class linkedInDriver(Driver):
 
-    def __init__(self,url):
-        self.driver = uc.Chrome()
-        self.driver.get(url)
+    def __init__(self,url="https://www.linkedin.com/feed/"):
+
+        super().__init__()
+
+        super().getURL(url)
         # Wait for the page to load
         time.sleep(2)
 
         # Wait for login to complete
         time.sleep(2)
+
 
     def insertJobTitle(self,title):
         f=0
@@ -58,15 +66,18 @@ class Driver:
         titles = [tag.text.strip() for tag in strong_tags if tag.text.strip()]
 
         return titles
+    def getHTML(self):
+        html_content = self.driver.page_source
+        return str(html_content)
 
 
 
 
-driver=Driver("https://www.linkedin.com/feed/")
+'''driver=Driver("https://www.linkedin.com/feed/")
 driver.insertJobTitle("python developer")
 driver.getJobsPage()
 time.sleep(2)
 titles=driver.getJobtitles()
 print(titles)
 time.sleep(60)
-driver.quit()
+driver.quit()'''
