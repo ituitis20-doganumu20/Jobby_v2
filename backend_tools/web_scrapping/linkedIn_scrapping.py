@@ -69,6 +69,19 @@ class linkedInDriver(Driver):
     def getHTML(self):
         html_content = self.driver.page_source
         return str(html_content)
+    def getURLs(self):
+        # Find all elements with class 'disabled ember-view job'
+        elements = self.driver.find_elements(By.CSS_SELECTOR, ".disabled.ember-view.job")
+
+        # Loop through the found elements and extract href attributes from <a> tags inside them
+        for element in elements:
+        # Find all <a> tags within the element
+            links = element.find_elements(By.TAG_NAME, 'a')
+            for link in links:
+                href = link.get_attribute('href')  # Get the href attribute
+                if href:  # Ensure the href attribute is not None
+                    print(href)
+
 
 
 
