@@ -10,13 +10,17 @@ import os
 
 # Add the project root (one level up) to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from backend_tools.web_scrapping.driver import Driver
+from web_scrapping.driver import Driver
 
 class linkedInDriver(Driver):
 
-    def __init__(self,url="https://www.linkedin.com/feed/"):
+    def __init__(self,):
 
         super().__init__()
+
+
+
+    def getURL(self,url="https://www.linkedin.com/feed/"):
 
         super().getURL(url)
         # Wait for the page to load
@@ -69,28 +73,51 @@ class linkedInDriver(Driver):
     def getHTML(self):
         html_content = self.driver.page_source
         return str(html_content)
-    def getURLs(self):
-        # Find all elements with class 'disabled ember-view job'
-        elements = self.driver.find_elements(By.CSS_SELECTOR, ".disabled.ember-view.job")
+    def getCompanyURLs(self):
 
-        # Loop through the found elements and extract href attributes from <a> tags inside them
-        for element in elements:
-        # Find all <a> tags within the element
-            links = element.find_elements(By.TAG_NAME, 'a')
-            for link in links:
-                href = link.get_attribute('href')  # Get the href attribute
-                if href:  # Ensure the href attribute is not None
-                    print(href)
+        time.sleep(2)
+        # Find all <a> tags where class contains 'job-card-list__title--link'
+        elements = self.driver.find_elements(By.XPATH, "//a[contains(@class, 'job-card-list__title--link')]")
+
+        # Extract hrefs
+        hrefs = [elem.get_attribute('href') for elem in elements]
 
 
+        #NEED TO BE Extended to get urls of all pages
+
+        return hrefs
+    def getJobInfo(self,urls):
+        jobsInfo=[]
+        for url in urls:
+            self.getURL(url)
+            # Find all <p> tags inside <div id="job-details">
+            p_tags = self.driver.find_elements(By.XPATH, "//div[@id='job-details']//p")
+
+            # Extract text content
+            #for p in p_tags:
+            jobsInfo.append(''.join(p.get_attribute("outerHTML") for p in p_tags))
+            for p in p_tags:
+                print(p.get_attribute("outerHTML"))
+        return jobsInfo
 
 
 
-'''driver=Driver("https://www.linkedin.com/feed/")
+
+
+
+
+
+
+driver=linkedInDriver()
+driver.getURL("https://www.linkedin.com/feed/")
 driver.insertJobTitle("python developer")
 driver.getJobsPage()
 time.sleep(2)
 titles=driver.getJobtitles()
 print(titles)
+urls=driver.getCompanyURLs()
+print(urls)
+jobsInfo=driver.getJobInfo(urls)
+print(jobsInfo)
 time.sleep(60)
-driver.quit()'''
+driver.quit()
