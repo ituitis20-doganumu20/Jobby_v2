@@ -22,3 +22,7 @@ class Llm:
         response = self.model.generate_content(prompt)
         return response.text
 
+llm_instance = Llm()
+def generate_gemini_response(prompt: str) -> str:
+    return llm_instance.generate_gemini_response(prompt)
+

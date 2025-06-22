@@ -4,7 +4,7 @@ import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
-from llm.gemini_client import generate_gemini_response
+from backend.cv_assistant import CVAssistant
 
 st.set_page_config(page_title="Jobby - AI Job Hunting Assistant", page_icon="💼", layout="centered")
 
@@ -27,11 +27,13 @@ if page == "CV Generator":
     st.subheader("Choose a CV Template")
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     template_folder = os.path.join(project_root, 'cv_templates')
+    template_path = os.path.join(project_root, "cv_templates", "cv_template_structure.json")
+    cv_assistant = CVAssistant(template_folder, template_path)
+
     if not os.path.exists(template_folder):
         st.error(f"Template folder not found: {template_folder}")
         st.stop()
-    image_files = sorted([f for f in os.listdir(template_folder) if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))])
-    template_labels = [f"Template {i+1}" for i in range(len(image_files))]
+    image_files, template_labels = cv_assistant.get_template_images()
     st.session_state.setdefault('selected_template', 0)
 
     cols = st.columns(3)
@@ -51,22 +53,12 @@ if page == "CV Generator":
     st.session_state.setdefault('cv_conversation', [])
     st.session_state.setdefault('last_gemini_response', None)
 
-    template_path = os.path.join(os.path.dirname(__file__), "cv_template_structure.json")
-    with open(template_path, "r") as f:
-        cv_template_structure = f.read()
-
-    initial_prompt = (
-        f"You are a CV assistant. The user has selected template {st.session_state.selected_template+1}. "
-        "I want you to help the user fill out a CV in the following JSON format:\n\n"
-        f"{cv_template_structure}\n\n"
-        "Ask the user, one by one, for each field needed to fill out this template. Wait for the user's answer after each question. "
-        "When all fields are filled, output the complete JSON."
-    )
+    initial_prompt = cv_assistant.get_initial_prompt(st.session_state.selected_template)
 
     if st.button("Start CV Assistant") or st.session_state.cv_assistant_started:
         st.session_state.cv_assistant_started = True
         if not st.session_state.cv_conversation:
-            gemini_response = generate_gemini_response(initial_prompt)
+            gemini_response = cv_assistant.get_gemini_response(initial_prompt)
             st.session_state.cv_conversation.append({"role": "gemini", "content": gemini_response})
             st.session_state.last_gemini_response = gemini_response
         else:
@@ -82,12 +74,11 @@ if page == "CV Generator":
                         conversation_prompt += f"Gemini: {turn['content']}\n"
                     else:
                         conversation_prompt += f"User: {turn['content']}\n"
-                gemini_response = generate_gemini_response(conversation_prompt)
+                gemini_response = cv_assistant.get_gemini_response(conversation_prompt)
                 st.session_state.cv_conversation.append({"role": "gemini", "content": gemini_response})
                 st.session_state.last_gemini_response = gemini_response
-                if gemini_response.strip().startswith('{'):
-                    result_json = json.loads(gemini_response)
-                    result_json["selectedTemplate"] = st.session_state.selected_template + 1
+                result_json = cv_assistant.parse_cv_json(gemini_response, st.session_state.selected_template)
+                if result_json:
                     st.success("CV JSON with selected template:")
                     st.json(result_json)
                 st.session_state["user_answer"] = ""
