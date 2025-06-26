@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
 from backend.cv_assistant import CVAssistant
+from agent.agent import Agent
 
 st.set_page_config(page_title="Jobby - AI Job Hunting Assistant", page_icon="💼", layout="centered")
 
@@ -18,7 +19,7 @@ Your AI-powered assistant for job hunting, CV creation, and motivational letters
 """)
 
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Select a feature:", ("Home", "CV Generator", "Job Search (coming soon)", "Motivational Letter (coming soon)"))
+page = st.sidebar.radio("Select a feature:", ("Home", "CV Generator", "Job Search", "Motivational Letter (coming soon)"))
 
 if page == "CV Generator":
     st.header("CV Generator")
@@ -85,5 +86,34 @@ if page == "CV Generator":
 
         st.text_input("Your answer", key="user_answer")
         st.button("Send Answer", on_click=process_user_answer)
+elif page == "Job Search":
+
+    st.header("Job Search")
+    #option = st.radio("Choose an option:", ["LinkedIn", "Xing"])
+    # Create a form
+    with st.form(key="job_form"):
+        job_title = st.text_input("Enter Job Title")
+        submit = st.form_submit_button(label="Submit")
+
+    if submit:
+        agent=Agent()
+        agent.specifyWebsite("linkedIn")
+        agent.driver.insertJobTitle(job_title)
+        agent.driver.getJobsPage()
+        urls=agent.driver.getCompanyURLs()
+        jobInfo=agent.driver.getJobInfo(urls)
+        #companyNamesURL=agent.linkedInGetCompanyNamesURL()
+        #print(jobTitles)
+        #print(companyNamesURL)
+        print(jobInfo)
+
+       
+
+
+
+
+
+
+
 else:
     st.info("Select an option from the sidebar to get started.")

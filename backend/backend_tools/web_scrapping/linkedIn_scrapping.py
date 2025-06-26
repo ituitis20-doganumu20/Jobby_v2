@@ -14,19 +14,10 @@ from web_scrapping.driver import Driver
 
 class linkedInDriver(Driver):
 
-    def __init__(self,):
+    def __init__(self,url="https://www.linkedin.com/feed/"):
 
         super().__init__()
-
-
-
-    def getURL(self,url="https://www.linkedin.com/feed/"):
-
         super().getURL(url)
-        # Wait for the page to load
-        time.sleep(2)
-
-        # Wait for login to complete
         time.sleep(2)
 
 
@@ -87,17 +78,26 @@ class linkedInDriver(Driver):
 
         return hrefs
     def getJobInfo(self,urls):
-        jobsInfo=[]
+        jobsInfo={}
         for url in urls:
             self.getURL(url)
+
+            # Locate the company name element
+            company_element = self.driver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__company-name")
+
+            # Extract company name text
+            company_name = company_element.text.strip()
+
+            #######################
             # Find all <p> tags inside <div id="job-details">
             p_tags = self.driver.find_elements(By.XPATH, "//div[@id='job-details']//p")
 
             # Extract text content
             #for p in p_tags:
-            jobsInfo.append(''.join(p.get_attribute("outerHTML") for p in p_tags))
-            for p in p_tags:
-                print(p.get_attribute("outerHTML"))
+            jobsInfo[company_name]=''.join(p.get_attribute("outerHTML") for p in p_tags)
+            #for p in p_tags:
+              #  print(p.get_attribute("outerHTML"))
+            print(jobsInfo)
         return jobsInfo
 
 
@@ -108,7 +108,7 @@ class linkedInDriver(Driver):
 
 
 
-driver=linkedInDriver()
+"""driver=linkedInDriver()
 driver.getURL("https://www.linkedin.com/feed/")
 driver.insertJobTitle("python developer")
 driver.getJobsPage()
@@ -121,3 +121,4 @@ jobsInfo=driver.getJobInfo(urls)
 print(jobsInfo)
 time.sleep(60)
 driver.quit()
+"""

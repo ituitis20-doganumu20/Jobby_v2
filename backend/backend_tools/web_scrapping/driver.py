@@ -15,4 +15,6 @@ class Driver:
     def getURL(self,url):
         
         self.driver.get(url)
+    def quit(self):
+        self.driver.quit()
 
