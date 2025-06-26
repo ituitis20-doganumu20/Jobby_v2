@@ -102,9 +102,6 @@ elif page == "Job Search":
         agent.driver.getJobsPage()
         urls=agent.driver.getCompanyURLs()
         jobInfo=agent.driver.getJobInfo(urls)
-        #companyNamesURL=agent.linkedInGetCompanyNamesURL()
-        #print(jobTitles)
-        #print(companyNamesURL)
         print(jobInfo)
 
        
