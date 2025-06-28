@@ -1,1 +1,99 @@
-{ "selectedTemplate": "1", "headings": { "education": "Education", "projects": "Projects", "awards": "Digital Credentials and Certifications", "work": "Work Experience", "skills": "Skills" }, "basics": { "name": "omar", "email": "osayed159@gmail.com", "location": { "address": "bonn,germany" }, "phone": "999999999", "website": "no" }, "education": [ { "location": "bonn germany", "studyType": "masters", "gpa": "N/A", "institution": "uni bonn", "startDate": "10/2018", "endDate": "04/2025" } ], "work": [ { "website": "no", "endDate": "12/2023", "highlights": [ "Developed and maintained key features for the company's flagship product" ], "company": "IBM", "position": "Application developer", "location": "Cairo,Egypt", "startDate": "12/2022" } ], "skills": [ { "name": "python", "level": "advanced", "keywords": [ "Machine learning" ] } ], "projects": [], "awards": [], "sections": [] }
+{
+  "selectedTemplate": "6",
+  "headings": {
+    "education": "Education",
+    "projects": "Projects",
+    "awards": "Digital Credentials and Certifications",
+    "work": "Work Experience",
+    "skills": "Skills"
+  },
+  "basics": {
+    "name": "James Bond",
+    "email": "james_bond@007.com",
+    "location": {
+      "address": "London,England"
+    },
+    "phone": "+007 007007007",
+    "website": "https://www.linkedin.com/in/omar-ismail-280897201/"
+  },
+  "education": [
+    {
+      "location": "Cairo,EG",
+      "studyType": "Bachelor of science",
+      "gpa": "3.007",
+      "institution": "German university in cairo",
+      "startDate": "10/2018",
+      "endDate": "07/2023"
+    },
+    {
+      "location": "Bonn,DE",
+      "studyType": "Master of Science",
+      "gpa": "1.007",
+      "institution": "University of Bonn",
+      "startDate": "04/2025",
+      "endDate": "Present"
+    }
+  ],
+  "work": [
+    {
+      "website": "no",
+      "endDate": "12/2023",
+      "highlights": [
+        "Wrote Java classes and methods to support rule execution and integrate with external APIs.",
+        "Utilized Java to build backend logic, handling data transformation, validation, and decision flow within IBM Operational Decision Manager (ODM).",
+        "Implemented unit and integration tests in Java to ensure reliability and maintainability of business services.",
+        "Translated business requirements into fully functional ODM services by designing, developing, and deploying Java-based solutions tailored to client needs.",
+        "Contributed to retail-focused projects such as Nike Customs Compliance Solution (CCS), integrating APLA region business rules.",
+        "Collaborated in Agile development teams, managing task timelines and addressing risks to ensure timely delivery."
+      ],
+      "company": "IBM",
+      "position": "Application Developer",
+      "location": "Cairo, EG",
+      "startDate": "12/2022"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Programming Languages",
+      "level": "",
+      "keywords": [
+        "java",
+        "python"
+      ]
+    },
+    {
+      "name": "Databases and Data management",
+      "level": "",
+      "keywords": [
+        "SQL",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "name": "Soft skills",
+      "level": "",
+      "keywords": [
+        "Problem-solving",
+        "Communication (written and verbal)",
+        "Teamwork",
+        "Time Management",
+        "Risk Management",
+        "Requirements Gathering",
+        "Solution Design"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "url": "https://shorturl.at/dZ0jo",
+      "keywords": [
+        "pandas",
+        "python",
+        "NumPy"
+      ],
+      "name": "Churn predictor",
+      "description": "DEVELOPED A CLASSIFICATION MODEL TO PREDICT PLAYER CHURN FOR TWO FREEMIUM GAMES USING SCIKIT-LEARN, WITH GPT-2 INTEGRATED TO GENERATE CHURN-RELATED INSIGHTS. PERFORMED EDA, FEATURE ENGINEERING, AND EVALUATED MODEL PERFORMANCE USING PRECISION, RECALL, AND F1 SCORE."
+    }
+  ],
+  "awards": []
+}

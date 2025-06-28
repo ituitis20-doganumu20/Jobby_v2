@@ -34,6 +34,7 @@ if page == "CV Generator":
     if not os.path.exists(template_folder):
         st.error(f"Template folder not found: {template_folder}")
         st.stop()
+    
     image_files, template_labels = cv_assistant.get_template_images()
     st.session_state.setdefault('selected_template', 0)
 
@@ -50,67 +51,75 @@ if page == "CV Generator":
 
     st.write(f"**Selected Template:** {template_labels[st.session_state.selected_template]}")
 
+    # Initialize session state variables
     st.session_state.setdefault('cv_assistant_started', False)
     st.session_state.setdefault('cv_conversation', [])
     st.session_state.setdefault('last_gemini_response', None)
+    st.session_state.setdefault('expecting_user_input', False)
 
     initial_prompt = cv_assistant.get_initial_prompt(st.session_state.selected_template)
 
+    def get_conversation_prompt():
+        prompt = initial_prompt + "\n\n"
+        for turn in st.session_state.cv_conversation:
+            if turn["role"] == "gemini":
+                prompt += f"Gemini: {turn['content']}\n"
+            else:
+                prompt += f"User: {turn['content']}\n"
+        return prompt
+
     if st.button("Start CV Assistant") or st.session_state.cv_assistant_started:
         st.session_state.cv_assistant_started = True
+        
         if not st.session_state.cv_conversation:
             gemini_response = cv_assistant.get_gemini_response(initial_prompt)
             st.session_state.cv_conversation.append({"role": "gemini", "content": gemini_response})
             st.session_state.last_gemini_response = gemini_response
+            st.session_state.expecting_user_input = True
         else:
             gemini_response = st.session_state.last_gemini_response
+        
         st.markdown(f"**Jobby:** {gemini_response}")
+
         def process_user_answer():
             user_answer = st.session_state["user_answer"]
-            if user_answer:
+            if user_answer and st.session_state.expecting_user_input:
                 st.session_state.cv_conversation.append({"role": "user", "content": user_answer})
-                conversation_prompt = initial_prompt + "\n\n"
-                for turn in st.session_state.cv_conversation:
-                    if turn["role"] == "gemini":
-                        conversation_prompt += f"Gemini: {turn['content']}\n"
-                    else:
-                        conversation_prompt += f"User: {turn['content']}\n"
+                conversation_prompt = get_conversation_prompt()
                 gemini_response = cv_assistant.get_gemini_response(conversation_prompt)
+                
+                # Clean up any fake user responses from the LLM
+                gemini_response = cv_assistant.validate_gemini_response(gemini_response)
                 st.session_state.cv_conversation.append({"role": "gemini", "content": gemini_response})
                 st.session_state.last_gemini_response = gemini_response
+                st.session_state["user_answer"] = ""
+                st.session_state.expecting_user_input = True
+                
                 result_json = cv_assistant.parse_cv_json(gemini_response, st.session_state.selected_template)
                 if result_json:
                     st.success("CV JSON with selected template:")
                     st.json(result_json)
-                st.session_state["user_answer"] = ""
+                    st.session_state.expecting_user_input = False
 
         st.text_input("Your answer", key="user_answer")
         st.button("Send Answer", on_click=process_user_answer)
-elif page == "Job Search":
 
+elif page == "Job Search":
     st.header("Job Search")
-    #option = st.radio("Choose an option:", ["LinkedIn", "Xing"])
+    
     # Create a form
     with st.form(key="job_form"):
         job_title = st.text_input("Enter Job Title")
         submit = st.form_submit_button(label="Submit")
 
     if submit:
-        agent=Agent()
+        agent = Agent()
         agent.specifyWebsite("linkedIn")
         agent.driver.insertJobTitle(job_title)
         agent.driver.getJobsPage()
-        urls=agent.driver.getCompanyURLs()
-        jobInfo=agent.driver.getJobInfo(urls)
+        urls = agent.driver.getCompanyURLs()
+        jobInfo = agent.driver.getJobInfo(urls)
         print(jobInfo)
-
-       
-
-
-
-
-
-
 
 else:
     st.info("Select an option from the sidebar to get started.")
