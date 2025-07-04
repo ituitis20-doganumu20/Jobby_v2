@@ -110,9 +110,21 @@ elif page == "Job Search":
     # Create a form
     with st.form(key="job_form"):
         job_title = st.text_input("Enter Job Title")
+        user_pref = st.text_area("Write your job preference for filtering")
         submit = st.form_submit_button(label="Submit")
+        
 
     if submit:
+        # Xing job scraping
+        if user_pref:
+            agent = Agent()
+            agent.specifyWebsite("xing")
+            xing_url = "https://www.xing.com/jobs/search?keywords=Werkstudent&location=Bonn&id=121067bff07394a5d92ce255fa4ee3a5&cityId=2946447.b8acbb&radius=100&careerLevel=1.795d28*2.24d1f6&sort=date&discipline=1011.6cf3f7*1007.b61d22*1022.ed6b40"
+            xing_results = agent.xingFilteredJobs(xing_url, user_pref)
+            st.write("Xing Jobs Matching Preference:")
+            for r in xing_results:
+                st.markdown(f"- [{r['url']}]({r['url']}) — {r['reason']}")
+        
         agent = Agent()
         agent.specifyWebsite("linkedIn")
         agent.driver.insertJobTitle(job_title)
