@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import llm.gemini_client as llm
 from backend.backend_tools.web_scrapping.linkedIn_scrapping import linkedInDriver
 from backend.backend_tools.web_scrapping.driver import Driver
+from backend.backend_tools.web_scrapping.xing_scrapping import xingDriver
 class Agent:
 
     def __init__(self):
@@ -16,10 +17,10 @@ class Agent:
         self.llm=llm.Llm()
 
     def specifyWebsite(self,driver_type):
-         if driver_type == "linkedIn":
+        if driver_type == "linkedIn":
             self.driver = linkedInDriver()
-       # elif driver_type == "xing":
-           # self.driver = xingDriver()
+        elif driver_type == "xing":
+            self.driver = xingDriver()
 
     def linkedInGetJobTitles(self,jobTitle):
         self.driver.insertJobTitle(jobTitle)
@@ -50,7 +51,7 @@ class Agent:
                 prompt += f"Job {idx+1}:\n{job['content']}\n\n"
 
             try:
-                result = self.llm.generate_gemini_response(prompt)
+                result = self.llm.generate_gemini_response(prompt) 
 
                 # 1) strip any markdown fences
                 clean = re.sub(r'```(?:json)?\s*', '', result)
