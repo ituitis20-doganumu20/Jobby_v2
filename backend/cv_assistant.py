@@ -34,8 +34,10 @@ class CVAssistant:
             "- Do not autofill any fields. Only use user input for each field.\n"
             "- Do not generate or simulate user responses.\n"
             "- Do not write 'User:' followed by any text.\n"
+            "- If the user chooses to leave a field empty, just leave it empty in the json file.\n"
             "- Only ask the next question and wait for the actual user to respond.\n"
             "- If you do not have a user answer, do not proceed.\n"
+            "- If you haven't asked the user for all the fields, do not proceed with the json output.\n"
             "- If the user doesn't want to add his level in a skill just put the json ""level"" field under the skills to be an empty string "".\n"
         )
         return prompt
