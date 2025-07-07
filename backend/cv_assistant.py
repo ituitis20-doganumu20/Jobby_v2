@@ -28,6 +28,7 @@ class CVAssistant:
             "Ask the user, one by one, for each field needed to fill out this template. Wait for the user's answer after each question. "
             "When all fields are filled, output the complete JSON."
             "Do not autofill any of the fields in the json file, only take inputs from user."
+            "If you see any spelling,gramatical,logical mistake in the user answers fix it before adding it to the json"
             "In the section of experience, try to suggest tweaks and changes to write what they want in the best way possible\n\n"
             "CRITICAL INSTRUCTIONS:\n"
             "- Do not autofill any fields. Only use user input for each field.\n"
