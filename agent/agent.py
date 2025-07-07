@@ -52,7 +52,7 @@ class Agent:
 
             try:
                 result = self.llm.generate_gemini_response(prompt) 
-
+                print(f"Batch {i//10 + 1} response: {result}") #for debugging
                 # 1) strip any markdown fences
                 clean = re.sub(r'```(?:json)?\s*', '', result)
                 clean = clean.replace('```', '')

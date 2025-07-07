@@ -7,10 +7,10 @@ from selenium.webdriver.support import expected_conditions as EC
 class xingDriver(Driver):
     def __init__(self):
         options = Options()
-        options.add_argument(r"--user-data-dir=C:\Users\umutc\chrome_selenium_profile")
-        options.add_argument("--profile-directory=Default")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
+        #options.add_argument(r"--user-data-dir=C:\Users\umutc\chrome_selenium_profile")
+        #options.add_argument("--profile-directory=Default")
+        #options.add_argument("--no-sandbox")
+        #options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--log-level=3")  # only fatal errors
         super().__init__(options=options)
         
@@ -56,6 +56,7 @@ class xingDriver(Driver):
         # Switch back to main window safely
         if main_window in self.driver.window_handles:
             self.driver.switch_to.window(main_window)
+            self.driver.close()
         else:
             print("Warning: Main window not found.")
 
