@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import sys
 import os
+import re
 
 # Add the project root (one level up) to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -77,6 +78,25 @@ class linkedInDriver(Driver):
         #NEED TO BE Extended to get urls of all pages
 
         return hrefs
+    def removeTags(self,txt):
+        stk=[]
+
+
+        ans=[]
+
+        for i in txt:
+    
+            if i=="<":
+        
+                stk.append(i)
+            elif i==">":
+                stk.pop()
+        
+            else:
+                if len(stk)==0:
+                    ans.append(i)
+        return re.sub(r'\s+', ' ', ''.join(ans).replace("\n", ""))
+        
     def getJobInfo(self,urls):
         jobsInfo={}
         for url in urls:
@@ -94,7 +114,9 @@ class linkedInDriver(Driver):
 
             # Extract text content
             #for p in p_tags:
-            jobsInfo[company_name]=''.join(p.get_attribute("outerHTML") for p in p_tags)
+            txt=''.join(p.get_attribute("outerHTML") for p in p_tags)
+            
+            jobsInfo[company_name]=self.removeTags(txt)
             #for p in p_tags:
               #  print(p.get_attribute("outerHTML"))
             print(jobsInfo)
