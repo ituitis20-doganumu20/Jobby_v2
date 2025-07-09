@@ -127,11 +127,8 @@ elif page == "Job Search":
         
         agent = Agent()
         agent.specifyWebsite("linkedIn")
-        agent.driver.insertJobTitle(job_title)
-        agent.driver.getJobsPage()
-        urls = agent.driver.getCompanyURLs()
-        jobInfo = agent.driver.getJobInfo(urls)
-        print(jobInfo)
+        jobInfo = agent.linkedInFilteredJobs(job_title,user_pref)
+        #print(jobInfo)
 
 else:
     st.info("Select an option from the sidebar to get started.")
