@@ -7,6 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import sys
 import os
+import re
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 # Add the project root (one level up) to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -66,19 +68,67 @@ class linkedInDriver(Driver):
         return str(html_content)
     def getCompanyURLs(self):
 
-        time.sleep(2)
-        # Find all <a> tags where class contains 'job-card-list__title--link'
-        elements = self.driver.find_elements(By.XPATH, "//a[contains(@class, 'job-card-list__title--link')]")
+        urls=[]
+        
+        while True:
+            try:
+                # Do your scraping or processing here
+                # Example: scrape current page content
 
-        # Extract hrefs
-        hrefs = [elem.get_attribute('href') for elem in elements]
+                time.sleep(1.5)
+                # Find all <a> tags where class contains 'job-card-list__title--link'
+                elements = self.driver.find_elements(By.XPATH, "//a[contains(@class, 'job-card-list__title--link')]")
 
+                # Extract hrefs
+                #hrefs = [elem.get_attribute('href') for elem in elements]
+                for elem in elements:
+                    urls.append(elem.get_attribute('href'))
+
+                # Wait for the "next" button to appear
+                next_button = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "button[aria-label='View next page']")
+                )
+            )
+
+                # Check if the button is clickable
+                if next_button.is_enabled():
+                    next_button.click()
+                    print("Clicked next page button")
+                else:
+                    print("Next button not enabled. Ending loop.")
+                    break
+
+            except (NoSuchElementException, TimeoutException):
+                print("No next button found. Ending loop.")
+                break
 
         #NEED TO BE Extended to get urls of all pages
 
-        return hrefs
+        return urls
+    def removeTags(self,txt):
+        stk=[]
+
+
+        ans=[]
+
+        for i in txt:
+    
+            if i=="<":
+        
+                stk.append(i)
+            elif i==">":
+                stk.pop()
+        
+            else:
+                if len(stk)==0:
+                    ans.append(i)
+        return re.sub(r'\s+', ' ', ''.join(ans).replace("\n", ""))
+        
     def getJobInfo(self,urls):
-        jobsInfo={}
+        jobsInfo={
+
+        }
         for url in urls:
             self.getURL(url)
 
@@ -94,7 +144,12 @@ class linkedInDriver(Driver):
 
             # Extract text content
             #for p in p_tags:
-            jobsInfo[company_name]=''.join(p.get_attribute("outerHTML") for p in p_tags)
+            txt=''.join(p.get_attribute("outerHTML") for p in p_tags)
+            jobsInfo[company_name]={
+                "url":url,
+                "description":self.removeTags(txt)
+            }
+           
             #for p in p_tags:
               #  print(p.get_attribute("outerHTML"))
             print(jobsInfo)

@@ -28,13 +28,16 @@ class CVAssistant:
             "Ask the user, one by one, for each field needed to fill out this template. Wait for the user's answer after each question. "
             "When all fields are filled, output the complete JSON."
             "Do not autofill any of the fields in the json file, only take inputs from user."
+            "If you see any spelling,gramatical,logical mistake in the user answers fix it before adding it to the json"
             "In the section of experience, try to suggest tweaks and changes to write what they want in the best way possible\n\n"
             "CRITICAL INSTRUCTIONS:\n"
             "- Do not autofill any fields. Only use user input for each field.\n"
             "- Do not generate or simulate user responses.\n"
             "- Do not write 'User:' followed by any text.\n"
+            "- If the user chooses to leave a field empty, just leave it empty in the json file.\n"
             "- Only ask the next question and wait for the actual user to respond.\n"
             "- If you do not have a user answer, do not proceed.\n"
+            "- If you haven't asked the user for all the fields, do not proceed with the json output.\n"
             "- If the user doesn't want to add his level in a skill just put the json ""level"" field under the skills to be an empty string "".\n"
         )
         return prompt

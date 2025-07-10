@@ -83,11 +83,36 @@ class Agent:
         print(f"Filtered jobs: {len(filtered)}")
         return filtered
 
-
+    def linkedInFilteredJobs(self,job_title,user_pref):
         
-"""agent=Agent()
-agent.specifyWebsite("linkedIn")
-agent.linkedInGetJobTitles("python developer")
-companyNamesURLS=agent.linkedInGetCompanyNamesURL()
-"""
+        self.driver.insertJobTitle(job_title)
+        self.driver.getJobsPage()
+        urls = self.driver.getCompanyURLs()
+        jobInfo = self.driver.getJobInfo(urls)
+        print(len(jobInfo))
+        #prompt = (
+        #        f"User preference: '{user_pref}'. For each of the following {jobInfo} jobs, say 'yes' or 'no' and why. "
+        #        f"Respond in this exact JSON format only:\n"
+        #        f"[{{'job': 1, 'answer': 'yes'/'no', 'reason': '...'}}, ...]\n\n"
+         #   )
+        #filtered=[]
+        #try:
+         #           result = self.llm.generate_gemini_response(prompt) 
+        #          #print(f"Batch {i//10 + 1} response: {result}") #for debugging
+        #           # 1) strip any markdown fences
+        #           clean = re.sub(r'```(?:json)?\s*', '', result)
+#                    clean = clean.replace('```', '')
+                    #print(clean)
+                    # 2) grab the entire JSON array
+                    #match = re.search(r'\[.*\]', clean, re.DOTALL)
+
+
+        #except Exception as e:
+            #print(e)
+                    # you might want to log e here'''
+                    
+
+        return jobInfo
+
+
 
