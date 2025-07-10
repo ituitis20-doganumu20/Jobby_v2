@@ -43,13 +43,17 @@ class Agent:
         for i in range(0, len(jobs), 10):
             batch = jobs[i:i+10]
             prompt = (
-                f"User preference: '{user_pref}'. For each of the following {len(batch)} jobs, say 'yes' or 'no' and why. "
+                f"User preference: '{user_pref}'. For each of the following {len(batch)} jobs, say 'yes' or 'no' and why.\n "
+                f"If the content of the job is unavailable by any change, say 'yes' also, since the user need to look to themselfs.\n"
                 f"Respond in this exact JSON format only:\n"
                 f"[{{'job': 1, 'answer': 'yes'/'no', 'reason': '...'}}, ...]\n\n"
             )
+            # Add each job's content to the prompt
+            prompt += "Here are the jobs:\n\n"
             for idx, job in enumerate(batch):
                 prompt += f"Job {idx+1}:\n{job['content']}\n\n"
-
+            
+            prompt += "End of jobs."
             try:
                 result = self.llm.generate_gemini_response(prompt) 
                 print(f"Batch {i//10 + 1} response: {result}") #for debugging
@@ -68,7 +72,8 @@ class Agent:
                     if ans["answer"].lower() == "yes":
                         filtered.append({
                             "url": batch[idx]["url"],
-                            "reason": ans["reason"]
+                            "reason": ans["reason"],
+                            "body": batch[idx]["content"]
                         })
 
             except Exception as e:
