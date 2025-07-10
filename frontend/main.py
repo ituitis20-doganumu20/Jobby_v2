@@ -111,7 +111,8 @@ elif page == "Job Search":
     with st.form(key="job_form"):
         job_title = st.text_input("Enter Job Title")
         submit = st.form_submit_button(label="Submit")
-        
+        user_pref = st.text_area("Write your job preference for filtering (LinkedIn)")
+
     if submit:
         # LinkedIn job scraping
         agent = Agent()
