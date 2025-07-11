@@ -42,42 +42,48 @@ class Agent:
 
         for i in range(0, len(jobs), 10):
             batch = jobs[i:i+10]
+
+            # Build single prompt for both filtering and summarizing
             prompt = (
-                f"User preference: '{user_pref}'. For each of the following {len(batch)} jobs, say 'yes' or 'no' and why.\n "
-                f"If the content of the job is unavailable by any change, say 'yes' also, since the user need to look to themselfs.\n"
-                f"Respond in this exact JSON format only:\n"
-                f"[{{'job': 1, 'answer': 'yes'/'no', 'reason': '...'}}, ...]\n\n"
+                f"You are an assistant helping a user find jobs based on their preference: '{user_pref}'.\n"
+                f"For each of the {len(batch)} jobs below, do two things:\n"
+                f"1. Say 'yes' or 'no' for whether the job matches the user's preference.\n"
+                f"2. If 'yes', give a short bullet-point summary with important information like title, responsibilities, requirements, location, and language needs.\n"
+                f"If your answer is no, say no summary in the summary json field, since we won't display them to the user, you dont need to write it anyways.\n"
+                f"Note: If job content is unavailable or unclear, respond with 'yes' so the user can check manually. For the summary you can say check by yourself.\n\n"
+                f"Respond in this exact JSON format:\n"
+                f"[{{'job': 1, 'answer': 'yes'/'no', 'reason': '...', 'summary': '...'}}, ...]\n\n"
             )
-            # Add each job's content to the prompt
+
             prompt += "Here are the jobs:\n\n"
             for idx, job in enumerate(batch):
-                prompt += f"Job {idx+1}:\n{job['content']}\n\n"
-            
+                prompt += f"Job {idx+1} (Title: {job['title']}):\n{job['content']}\n\n"
             prompt += "End of jobs."
-            try:
-                result = self.llm.generate_gemini_response(prompt) 
-                print(f"Batch {i//10 + 1} response: {result}") #for debugging
-                # 1) strip any markdown fences
-                clean = re.sub(r'```(?:json)?\s*', '', result)
-                clean = clean.replace('```', '')
 
-                # 2) grab the entire JSON array
+            try:
+                result = self.llm.generate_gemini_response(prompt)
+                print(f"Batch {i//10 + 1} response: {result}")
+
+                # Clean markdown
+                clean = re.sub(r'```(?:json)?\s*', '', result).replace('```', '')
                 match = re.search(r'\[.*\]', clean, re.DOTALL)
                 if not match:
                     continue
 
-                # 3) parse and filter
-                answers = json.loads(match.group(0))
-                for idx, ans in enumerate(answers):
-                    if ans["answer"].lower() == "yes":
+                responses = json.loads(match.group(0))
+                for idx, resp in enumerate(responses):
+                    if resp["answer"].lower() == "yes":
+                        job = batch[idx]
                         filtered.append({
-                            "url": batch[idx]["url"],
-                            "reason": ans["reason"],
-                            "body": batch[idx]["content"]
+                            "title": job["title"],
+                            "url": job["url"],
+                            "reason": resp["reason"],
+                            "body": job["content"],
+                            "job_sum": resp["summary"]
                         })
 
             except Exception as e:
-                # you might want to log e here
+                print(f"Error in batch {i//10 + 1}: {e}")
                 continue
 
         print(f"Filtered jobs: {len(filtered)}")

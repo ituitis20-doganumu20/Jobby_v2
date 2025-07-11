@@ -122,18 +122,32 @@ elif page == "Job Search":
     
     # XING Job Search Form
     with st.form(key="xing_form"):
+        xing_url = st.text_input("Paste the Xing job search URL here")
         user_pref = st.text_area("Write your job preference for filtering (Xing)")
-        submit_xing = st.form_submit_button(label="Search Xing Jobs")   
-    
+        submit_xing = st.form_submit_button(label="Search Xing Jobs")
+
     if submit_xing:
-            agent = Agent()
-            agent.specifyWebsite("xing")
-            xing_url = "https://www.xing.com/jobs/search?keywords=Werkstudent&location=Bonn&id=121067bff07394a5d92ce255fa4ee3a5&cityId=2946447.b8acbb&radius=100&careerLevel=1.795d28*2.24d1f6&sort=date&discipline=1011.6cf3f7*1007.b61d22*1022.ed6b40"
-            xing_results = agent.xingFilteredJobs(xing_url, user_pref)
-            st.write("Xing Jobs Matching Preference:")
-            for r in xing_results:
-                st.markdown(f"- [{r['url']}]({r['url']}) — {r['reason']}")
+        agent = Agent()
+        agent.specifyWebsite("xing")
         
+        xing_results = agent.xingFilteredJobs(xing_url, user_pref)
+
+        st.subheader("Matching Xing Jobs:")
+
+        if not xing_results:
+            st.info("No matching jobs found.")
+        else:
+            for job in xing_results:
+                with st.expander(job["title"]):  # Only title visible initially
+                    st.markdown(f"**Summary:**\n\n{job['job_sum']}")
+                    st.markdown(f"[View Full Job Posting]({job['url']})", unsafe_allow_html=True)
+
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.button("CV", key=f"cv_{job['url']}")
+                    with col2:
+                        st.button("Motivation Letter", key=f"ml_{job['url']}")
+
 
 else:
     st.info("Select an option from the sidebar to get started.")
