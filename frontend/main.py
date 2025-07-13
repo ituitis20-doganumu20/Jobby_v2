@@ -4,8 +4,6 @@ import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
-from backend.cv_assistant import CVAssistant
-from agent.agent import Agent
 
 st.set_page_config(page_title="Jobby - AI Job Hunting Assistant", page_icon="💼", layout="centered")
 
@@ -161,6 +159,3 @@ elif page == "Job Search":
         else:
             display(xing_results)
 
-
-else:
-    st.info("Select an option from the sidebar to get started.")
