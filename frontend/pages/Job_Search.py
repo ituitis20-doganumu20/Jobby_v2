@@ -50,11 +50,4 @@ if submit_xing:
             with st.expander(job["title"]):  # Only title visible initially
                 st.markdown(f"**Summary:**\n\n{job['job_sum']}")
                 st.markdown(f"[View Full Job Posting]({job['url']})", unsafe_allow_html=True)
-
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("CV", key=f"cv_{idx}_{job['url']}"):
-                        st.switch_page("1_CV_Generator.py")
-                with col2:
-                    if st.button("Motivation Letter", key=f"ml_{idx}_{job['url']}"):
-                        st.switch_page("3_Motivational_Letter.py") 
+                st.text_input("Copy Job Link", value=job['url'], key=f"job_url_{idx}", help="Click the copy button to copy the job link.") 
