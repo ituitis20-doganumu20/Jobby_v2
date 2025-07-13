@@ -66,14 +66,18 @@ class linkedInDriver(Driver):
     def getHTML(self):
         html_content = self.driver.page_source
         return str(html_content)
-    def getCompanyURLs(self):
+    def getCompanyURLs(self,numberOfJobs):
 
         urls=[]
+
+        flag=False
         
         while True:
+
+        
+
             try:
-                # Do your scraping or processing here
-                # Example: scrape current page content
+               
 
                 time.sleep(1.5)
                 # Find all <a> tags where class contains 'job-card-list__title--link'
@@ -82,8 +86,13 @@ class linkedInDriver(Driver):
                 # Extract hrefs
                 #hrefs = [elem.get_attribute('href') for elem in elements]
                 for elem in elements:
+                    print(len(urls))
+                    if len(urls)==numberOfJobs:
+                        flag=True
+                        break
                     urls.append(elem.get_attribute('href'))
-
+                if flag==True:
+                    break
                 # Wait for the "next" button to appear
                 next_button = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located(
@@ -103,7 +112,6 @@ class linkedInDriver(Driver):
                 print("No next button found. Ending loop.")
                 break
 
-        #NEED TO BE Extended to get urls of all pages
 
         return urls
     def removeTags(self,txt):
@@ -126,10 +134,8 @@ class linkedInDriver(Driver):
         return re.sub(r'\s+', ' ', ''.join(ans).replace("\n", ""))
         
     def getJobInfo(self,urls):
-        jobsInfo={
-
-        }
-        for url in urls:
+       results = []
+       for url in urls:
             self.getURL(url)
 
             # Locate the company name element
@@ -145,15 +151,16 @@ class linkedInDriver(Driver):
             # Extract text content
             #for p in p_tags:
             txt=''.join(p.get_attribute("outerHTML") for p in p_tags)
-            jobsInfo[company_name]={
-                "url":url,
-                "description":self.removeTags(txt)
-            }
            
-            #for p in p_tags:
-              #  print(p.get_attribute("outerHTML"))
-            print(jobsInfo)
-        return jobsInfo
+            results.append({
+                "title": company_name,
+                "url": url,
+                "content": self.removeTags(txt)
+            })
+           
+           
+       
+       return results
 
 
 

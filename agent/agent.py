@@ -35,13 +35,11 @@ class Agent:
         response=self.llm.generate_gemini_response("Extract each company name and its url from this html code"+html)
         #print(response)
         return response
-    
-    def xingFilteredJobs(self, url, user_pref):
-        jobs = self.driver.getJobContents(url)
+    def prompt(self,jobsInfo,batch_size,user_pref):
+        
         filtered = []
-
-        for i in range(0, len(jobs), 10):
-            batch = jobs[i:i+10]
+        for i in range(0, len(jobsInfo), batch_size):
+            batch = jobsInfo[i:i+batch_size]
 
             # Build single prompt for both filtering and summarizing
             prompt = (
@@ -88,37 +86,23 @@ class Agent:
 
         print(f"Filtered jobs: {len(filtered)}")
         return filtered
+    
+    def xingFilteredJobs(self, url, user_pref):
+        jobs = self.driver.getJobContents(url)
+        filtered=self.prompt(jobs,10,user_pref)
+        return filtered
 
-    def linkedInFilteredJobs(self,job_title,user_pref):
+    def linkedInFilteredJobs(self,job_title,numberOfJobs):
         
         self.driver.insertJobTitle(job_title)
         self.driver.getJobsPage()
-        urls = self.driver.getCompanyURLs()
-        jobInfo = self.driver.getJobInfo(urls)
-        print(len(jobInfo))
-        #prompt = (
-        #        f"User preference: '{user_pref}'. For each of the following {jobInfo} jobs, say 'yes' or 'no' and why. "
-        #        f"Respond in this exact JSON format only:\n"
-        #        f"[{{'job': 1, 'answer': 'yes'/'no', 'reason': '...'}}, ...]\n\n"
-         #   )
-        #filtered=[]
-        #try:
-         #           result = self.llm.generate_gemini_response(prompt) 
-        #          #print(f"Batch {i//10 + 1} response: {result}") #for debugging
-        #           # 1) strip any markdown fences
-        #           clean = re.sub(r'```(?:json)?\s*', '', result)
-#                    clean = clean.replace('```', '')
-                    #print(clean)
-                    # 2) grab the entire JSON array
-                    #match = re.search(r'\[.*\]', clean, re.DOTALL)
-
-
-        #except Exception as e:
-            #print(e)
-                    # you might want to log e here'''
-                    
+        urls = self.driver.getCompanyURLs(numberOfJobs)
+        jobInfo = self.driver.getJobInfo(urls) 
 
         return jobInfo
+    
+    def linkedInPrompt(self, jobsInfo, user_pref,batch_size):
 
-
-
+        
+        filtered=self.prompt(jobsInfo,batch_size,user_pref)
+        return filtered

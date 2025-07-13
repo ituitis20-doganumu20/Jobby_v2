@@ -17,6 +17,18 @@ Your AI-powered assistant for job hunting, CV creation, and motivational letters
 
 ---
 """)
+            
+def display(prompt):
+        for job in prompt:
+                with st.expander(job["title"]):  # Only title visible initially
+                    st.markdown(f"**Summary:**\n\n{job['job_sum']}")
+                    st.markdown(f"[View Full Job Posting]({job['url']})", unsafe_allow_html=True)
+
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.button("CV", key=f"cv_{job['url']}")
+                    with col2:
+                        st.button("Motivation Letter", key=f"ml_{job['url']}")
 
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Select a feature:", ("Home", "CV Generator", "Job Search", "Motivational Letter (coming soon)"))
@@ -110,15 +122,25 @@ elif page == "Job Search":
     # Create a form
     with st.form(key="job_form"):
         job_title = st.text_input("Enter Job Title")
-        submit = st.form_submit_button(label="Submit")
+        numberOfJobs = st.text_input("Enter Number Of Jobs to search for")
         user_pref = st.text_area("Write your job preference for filtering (LinkedIn)")
+        submit = st.form_submit_button(label="Submit")
+
 
     if submit:
         # LinkedIn job scraping
         agent = Agent()
         agent.specifyWebsite("linkedIn")
-        jobInfo = agent.linkedInFilteredJobs(job_title,user_pref)
-        #print(jobInfo)
+        jobsInfo = agent.linkedInFilteredJobs(job_title,int(numberOfJobs))
+        prompt=agent.linkedInPrompt(jobsInfo,user_pref,5)
+        print(prompt)
+        st.subheader("Matching Xing Jobs:")
+
+        if not prompt:
+            st.info("No matching jobs found.")
+        else:
+            display(prompt)
+            
     
     # XING Job Search Form
     with st.form(key="xing_form"):
@@ -137,16 +159,7 @@ elif page == "Job Search":
         if not xing_results:
             st.info("No matching jobs found.")
         else:
-            for job in xing_results:
-                with st.expander(job["title"]):  # Only title visible initially
-                    st.markdown(f"**Summary:**\n\n{job['job_sum']}")
-                    st.markdown(f"[View Full Job Posting]({job['url']})", unsafe_allow_html=True)
-
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.button("CV", key=f"cv_{job['url']}")
-                    with col2:
-                        st.button("Motivation Letter", key=f"ml_{job['url']}")
+            display(xing_results)
 
 
 else:
