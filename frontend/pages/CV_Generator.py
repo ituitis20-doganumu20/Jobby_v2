@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 
 import streamlit as st
 from backend.cv_assistant import CVAssistant
+from backend.resume_driver import ResumeDriver
 
 st.set_page_config(page_title="CV Generator - Jobby", page_icon="💼", layout="centered")
 
@@ -90,7 +91,22 @@ if st.button("Start CV Assistant") or st.session_state.cv_assistant_started:
             if result_json:
                 st.success("CV JSON with selected template:")
                 st.json(result_json)
+                
+                # Save it for automation script
+                output_path = os.path.abspath(os.path.join(project_root, "output", "generated_cv.json"))
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+                with open(output_path, "w", encoding="utf-8") as f:
+                    json.dump(result_json, f, indent=4)
+
                 st.session_state.expecting_user_input = False
+
+                # Show button to trigger Selenium
+                if st.button("📥 Download CV as PDF"):
+                    with st.spinner("Generating and downloading your CV..."):
+                        downloader = ResumeDriver()
+                        downloader.uploadJSONAndDownloadCV('./output/generated_cv.json')
+                        st.success("Your CV PDF has been downloaded!")
 
     st.text_input("Your answer", key="user_answer")
     st.button("Send Answer", on_click=process_user_answer) 

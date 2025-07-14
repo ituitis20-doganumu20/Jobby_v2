@@ -3,4 +3,9 @@ google-generativeai>=0.3.0
 python-dotenv>=1.0.0
 selenium>=4.0.0
 undetected-chromedriver>=3.5.0
+python-docx>=0.8.11
+PyPDF2>=3.0.0
+googlesearch-python>=1.2.3
+requests>=2.31.0
+beautifulsoup4>=4.12.0
 
