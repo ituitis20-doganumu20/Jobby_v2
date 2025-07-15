@@ -4,6 +4,7 @@ import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
+from agent.agent import Agent
 
 st.set_page_config(page_title="Jobby - AI Job Hunting Assistant", page_icon="💼", layout="centered")
 
