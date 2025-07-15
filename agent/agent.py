@@ -89,7 +89,7 @@ class Agent:
     
     def xingFilteredJobs(self, url, user_pref):
         jobs = self.driver.getJobContents(url)
-        filtered=self.prompt(jobs,10,user_pref)
+        filtered=self.prompt_one_by_one(jobs,user_pref)
         return filtered
 
     def linkedInFilteredJobs(self,job_title,numberOfJobs):
@@ -101,6 +101,46 @@ class Agent:
 
         return jobInfo
     
+    def prompt_one_by_one(self, jobsInfo, user_pref):
+        filtered = []
+        for idx, job in enumerate(jobsInfo):
+            prompt = (
+                f"You are an assistant helping a user find jobs based on their preference: '{user_pref}'.\n"
+                f"For the job below, do two things:\n"
+                f"1. Say 'yes' or 'no' for whether the job matches the user's preference.\n"
+                f"2. If 'yes', give a short bullet-point summary with important information like title, responsibilities, requirements, location, and language needs.\n"
+                f"If your answer is no, say no summary in the summary json field.\n"
+                f"Note: If job content is unavailable or unclear, respond with 'yes'. For the summary you can say check by yourself.\n\n"
+                f"Respond in this exact JSON format:\n"
+                f"[{{'job': 1, 'answer': 'yes'/'no', 'reason': '...', 'summary': '...'}}]\n\n"
+                f"Job 1 (Title: {job['title']}):\n{job['content']}\n\nEnd of job."
+            )
+
+            try:
+                result = self.llm.generate_gemini_response(prompt)
+                clean = re.sub(r'```(?:json)?\s*', '', result).replace('```', '')
+                match = re.search(r'\[.*\]', clean, re.DOTALL)
+                if not match:
+                    continue
+
+                resp = json.loads(match.group(0))[0]
+                if resp["answer"].lower() == "yes":
+                    filtered.append({
+                        "title": job["title"],
+                        "url": job["url"],
+                        "reason": resp["reason"],
+                        "body": job["content"],
+                        "job_sum": resp["summary"]
+                    })
+
+            except Exception as e:
+                print(f"Error on job {idx + 1}: {e}")
+                continue
+
+        print(f"Filtered jobs: {len(filtered)}")
+        return filtered
+
+        
     def linkedInPrompt(self, jobsInfo, user_pref,batch_size):
 
         
