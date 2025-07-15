@@ -9,6 +9,17 @@ from agent.agent import Agent
 st.set_page_config(page_title="Job Search - Jobby", page_icon="💼", layout="centered")
 
 st.title("Job Search")
+def display(prompt):
+        for job in prompt:
+                with st.expander(job["title"]):  # Only title visible initially
+                    st.markdown(f"**Summary:**\n\n{job['job_sum']}")
+                    st.markdown(f"[View Full Job Posting]({job['url']})", unsafe_allow_html=True)
+
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.button("CV", key=f"cv_{job['url']}")
+                    with col2:
+                        st.button("Motivation Letter", key=f"ml_{job['url']}")
 
 # Back button to return to main app
 if st.sidebar.button("← Back to Main"):
@@ -19,15 +30,25 @@ st.header("Job Search")
 # Create a form
 with st.form(key="job_form"):
     job_title = st.text_input("Enter Job Title")
-    submit = st.form_submit_button(label="Submit")
+    numberOfJobs = st.text_input("Enter Number Of Jobs")
     user_pref = st.text_area("Write your job preference for filtering (LinkedIn)")
+    submit = st.form_submit_button(label="Submit")
+
 
 if submit:
     # LinkedIn job scraping
+
     agent = Agent()
     agent.specifyWebsite("linkedIn")
-    jobInfo = agent.linkedInFilteredJobs(job_title,user_pref)
-    #print(jobInfo)
+    jobsInfo = agent.linkedInFilteredJobs(job_title,int(numberOfJobs))
+    prompt=agent.linkedInPrompt(jobsInfo,user_pref,5)
+    print(prompt)
+    st.subheader("Matching LinkedIn Jobs:")
+
+    if not prompt:
+        st.info("No matching jobs found.")
+    else:
+        display(prompt)
 
 # XING Job Search Form
 with st.form(key="xing_form"):
@@ -46,8 +67,4 @@ if submit_xing:
     if not xing_results:
         st.info("No matching jobs found.")
     else:
-        for idx, job in enumerate(xing_results):
-            with st.expander(job["title"]):  # Only title visible initially
-                st.markdown(f"**Summary:**\n\n{job['job_sum']}")
-                st.markdown(f"[View Full Job Posting]({job['url']})", unsafe_allow_html=True)
-                st.text_input("Copy Job Link", value=job['url'], key=f"job_url_{idx}", help="Click the copy button to copy the job link.") 
+        display(xing_results)
