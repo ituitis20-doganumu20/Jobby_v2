@@ -79,7 +79,7 @@ class linkedInDriver(Driver):
             try:
                
 
-                time.sleep(1.5)
+                time.sleep(4)
                 # Find all <a> tags where class contains 'job-card-list__title--link'
                 elements = self.driver.find_elements(By.XPATH, "//a[contains(@class, 'job-card-list__title--link')]")
 
@@ -111,7 +111,6 @@ class linkedInDriver(Driver):
             except (NoSuchElementException, TimeoutException):
                 print("No next button found. Ending loop.")
                 break
-
 
         return urls
     def removeTags(self,txt):
@@ -159,7 +158,7 @@ class linkedInDriver(Driver):
             })
            
            
-       
+       self.driver.close()
        return results
 
 

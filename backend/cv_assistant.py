@@ -46,10 +46,39 @@ class CVAssistant:
         return generate_gemini_response(prompt)
 
     def parse_cv_json(self, gemini_response, selected_template):
+        # First try: response starts with JSON
         if gemini_response.strip().startswith('{'):
-            result_json = json.loads(gemini_response)
-            result_json["selectedTemplate"] = selected_template + 1
-            return result_json
+            try:
+                result_json = json.loads(gemini_response)
+                result_json["selectedTemplate"] = selected_template + 1
+                return result_json
+            except json.JSONDecodeError:
+                pass
+        
+        # Second try: find JSON within the response
+        import re
+        # Look for JSON block in the response
+        json_match = re.search(r'\{.*\}', gemini_response, re.DOTALL)
+        if json_match:
+            try:
+                json_str = json_match.group(0)
+                result_json = json.loads(json_str)
+                result_json["selectedTemplate"] = selected_template + 1
+                return result_json
+            except json.JSONDecodeError:
+                pass
+        
+        # Third try: look for code blocks with JSON
+        code_block_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', gemini_response, re.DOTALL | re.IGNORECASE)
+        if code_block_match:
+            try:
+                json_str = code_block_match.group(1)
+                result_json = json.loads(json_str)
+                result_json["selectedTemplate"] = selected_template + 1
+                return result_json
+            except json.JSONDecodeError:
+                pass
+        
         return None
 
     def validate_gemini_response(self, response):

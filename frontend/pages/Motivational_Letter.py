@@ -1,6 +1,5 @@
 import sys
 import os
-import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import streamlit as st
@@ -8,6 +7,8 @@ from llm.gemini_client import generate_gemini_response
 
 import docx
 import PyPDF2
+
+from backend.company_info_scraper import get_company_info
 
 st.set_page_config(page_title="Motivational Letter - Jobby", page_icon="💼", layout="centered")
 
@@ -49,6 +50,7 @@ def extract_text_from_file(uploaded_file):
 
 with st.form(key="cover_letter_form"):
     uploaded_cv = st.file_uploader("Upload your CV (PDF, DOCX, or TXT):", type=["pdf", "docx", "txt"])
+    company_name = st.text_input("Target company name (e.g., SAP):")
     job_desc = st.text_area("The job description/link:")
     submit = st.form_submit_button("Generate Cover Letter")
 
@@ -56,10 +58,17 @@ if submit:
     cv_text = extract_text_from_file(uploaded_cv)
     if not cv_text:
         st.error("Could not read the uploaded CV. Please check the file and try again.")
+
+    elif not company_name.strip():
+        st.error("Please enter a company name.")
+
     elif not job_desc.strip():
         st.error("Please paste the job description/link.")
+
     else:
         with st.spinner("Jobby is generating your cover letter..."):
+            company_info = get_company_info(company_name)
+
             prompt = f"""
 You are an expert career assistant. Generate a professional, personalized cover letter for the following job application.
 
@@ -69,7 +78,10 @@ You are an expert career assistant. Generate a professional, personalized cover 
 - The job description:
 {job_desc}
 
-Write the letter in a formal, engaging tone. Address the key requirements of the job and highlight the user's relevant experience.
+- Company Information:
+{company_info}
+
+Write the letter in a formal, engaging tone. Address the key requirements of the job, highlight the user's relevant experience and include only company information that is relevant to the job application.
 """
             cover_letter = generate_gemini_response(prompt)
             st.success("Your customized cover letter:")
