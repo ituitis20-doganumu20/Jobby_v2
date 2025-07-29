@@ -14,9 +14,13 @@ An intelligent job hunting assistant that utilizes AI to help you find opportuni
 
 ### Document and Web Parsing
 python-docx>=0.8.11
+
 PyPDF2>=3.0.0
+
 googlesearch-python>=1.2.3
+
 requests>=2.31.0
+
 beautifulsoup4>=4.12.0
 
 ### Backend
