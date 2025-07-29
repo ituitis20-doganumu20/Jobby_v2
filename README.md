@@ -7,15 +7,22 @@ An intelligent job hunting assistant that utilizes AI to help you find opportuni
 - **AI-Powered Job Search**: Uses Gemini API to analyze job descriptions and match them with your profile
 - **Automated Job Scraping**: Selenium-based web scraping to gather job opportunities from multiple platforms
 - **Customized CV Generation**: AI-driven CV creation tailored to specific job requirements
-- **Motivational Letter Creator**: Personalized cover letters generated using AI analysis
-- **Interactive Web Interface**: User-friendly Streamlit frontend for seamless interaction
+- **Motivational Letter Creator**: Personalized cover letters generated using AI 
+- **Interactive Web Interface**: User-friendly Streamlit frontend for easy interaction
 
 ## 🛠️ Tech Stack
 
+### Document and Web Parsing
+-**python-docx>**=0.8.11
+-**PyPDF2>**=3.0.0
+-**googlesearch-python>=**1.2.3
+-**requests>=**2.31.0
+-**beautifulsoup4>=**4.12.0
+
 ### Backend
-- **Python 3.8+**: Core programming language
-- **Selenium**: Web automation and job scraping
-- **Gemini API**: Google's AI model for natural language processing and content generation
+-**selenium>=**4.14.0         
+-**google-generativeai>=**0.3.2  
+
 
 ### Frontend
 - **Streamlit**: Modern web application framework for Python
@@ -68,13 +75,3 @@ Before running this project, make sure you have:
 3. **Open your browser**
    Navigate to `http://localhost:8501`
 
-### Using the Application
-
-## 🔧 Configuration
-
-### API Keys
-- **Gemini API**: Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
-
-### CV Generator
-
-### Letter Generator
