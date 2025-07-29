@@ -48,8 +48,8 @@ if submit:
 
 # XING Job Search Form
 with st.form(key="xing_form"):
-    xing_url = st.text_input("Paste the Xing job search URL here")
-    user_pref = st.text_area("Write your job preference for filtering (Xing)")
+    xing_url = st.text_input("Paste the Xing job search URL here, ex: https://www.xing.com/jobs/search?keywords=Werkstudent&location=Bonn")
+    user_pref = st.text_area("Write your job preference for filtering (Xing):")
     submit_xing = st.form_submit_button(label="Search Xing Jobs")
 
 if submit_xing:
