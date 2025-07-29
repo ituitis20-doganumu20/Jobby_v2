@@ -15,11 +15,7 @@ def display(prompt):
                     st.markdown(f"**Summary:**\n\n{job['job_sum']}")
                     st.markdown(f"[View Full Job Posting]({job['url']})", unsafe_allow_html=True)
 
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.button("CV", key=f"cv_{job['url']}")
-                    with col2:
-                        st.button("Motivation Letter", key=f"ml_{job['url']}")
+
 
 # Back button to return to main app
 if st.sidebar.button("← Back to Main"):
