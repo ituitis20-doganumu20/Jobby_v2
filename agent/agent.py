@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import re
+import time
 
 # Add the project root (one level up) to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -81,7 +82,7 @@ class Agent:
                         })
 
             except Exception as e:
-                print(f"Error in batch {i//10 + 1}: {e}")
+                print(f"Error in batch {i//10 + 1}: {e[:50]}")
                 continue
 
         print(f"Filtered jobs: {len(filtered)}")
@@ -136,7 +137,7 @@ class Agent:
                     break  # success
                 except Exception as e:
                     print(f"Retrying job {idx + 1} due to error: {e}")
-                    time.sleep(2)  # optional: avoid hammering the API
+                    time.sleep(5)  # optional: avoid hammering the API
                     continue
 
         print(f"Filtered jobs: {len(filtered)}")

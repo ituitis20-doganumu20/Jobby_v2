@@ -28,8 +28,8 @@ class xingDriver(Driver):
                 break
 
         # Wait for job cards to load
-        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.card-styles__CardLink-sc-ecfcdbce-2.eVLJBS")))
-        job_links = self.driver.find_elements(By.CSS_SELECTOR, "a.card-styles__CardLink-sc-ecfcdbce-2.eVLJBS")
+        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.card-styles__CardLink-sc-cdebccb7-2.gHqAMw")))
+        job_links = self.driver.find_elements(By.CSS_SELECTOR, "a.card-styles__CardLink-sc-cdebccb7-2.gHqAMw")
 
         # Extract job titles and hrefs
         job_info_list = []
