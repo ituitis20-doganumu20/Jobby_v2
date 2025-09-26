@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 class xingDriver(Driver):
     def __init__(self):
@@ -18,14 +19,8 @@ class xingDriver(Driver):
         self.getURL(url)
         wait = WebDriverWait(self.driver, 10)
 
-        # Try clicking "Show more" up to 3 times
-        for _ in range(3):
-            try:
-                show_more_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='Show more']")))
-                show_more_btn.click()
-            except:
-                print("No 'Show more' button found or it is not clickable — continuing.")
-                break
+        # Wait for the page to load
+        time.sleep(20)  # Adjust sleep time as necessary
 
         # Wait for job cards to load
         wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.card-styles__CardLink-sc-cdebccb7-2.gHqAMw")))
@@ -66,6 +61,5 @@ class xingDriver(Driver):
 
         # Close main window
         self.driver.close()
-
         #print(results)
         return results

@@ -15,8 +15,7 @@ class Driver:
         if options:
             self.driver = webdriver.Chrome(options=options)
         else:
-            import undetected_chromedriver as uc
-            self.driver = uc.Chrome()
+            self.driver = webdriver.Chrome(options=options)
 
 
     def getURL(self,url):

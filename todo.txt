@@ -1,0 +1,7 @@
+url query parameters and dropdown buttons for it
+
+
+include jobs if the body cannot be extracted, user should look for it manually
+
+make it dropdown include body of the job while returning the filtered jobs
+

@@ -4,6 +4,7 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 import undetected_chromedriver as uc
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 import sys
 import os
@@ -17,7 +18,12 @@ from web_scrapping.driver import Driver
 class linkedInDriver(Driver):
 
     def __init__(self,url="https://www.linkedin.com/feed/"):
-
+        options = Options()
+        options.add_argument(r"--user-data-dir=C:\Users\umutc\chrome_selenium_profile")
+        options.add_argument("--profile-directory=Default")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--log-level=3")  # only fatal errors
         super().__init__()
         super().getURL(url)
         time.sleep(2)

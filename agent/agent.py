@@ -90,6 +90,7 @@ class Agent:
     
     def xingFilteredJobs(self, url, user_pref):
         jobs = self.driver.getJobContents(url)
+        print(f"Total jobs scraped: {len(jobs)}")
         filtered=self.prompt_one_by_one(jobs,user_pref)
         return filtered
 
@@ -103,15 +104,19 @@ class Agent:
         return jobInfo
     
     def prompt_one_by_one(self, jobsInfo, user_pref):
+        print(f"Starting filtering")
         filtered = []
         for idx, job in enumerate(jobsInfo):
             while True:
                 try:
+                    # Get the current API key
+                    current_api_key = self.llm.get_api_key()
+
                     prompt = (
                         f"You are an assistant helping a user find jobs based on their preference: '{user_pref}'.\n"
                         f"For the job below, do two things:\n"
                         f"1. Say 'yes' or 'no' for whether the job matches the user's preference.\n"
-                        f"2. If 'yes', give a short bullet-point summary with important information like title, responsibilities, requirements, location, and language needs.\n"
+                        f"2. If 'yes', give a short bullet-point summary with important information like title, responsibilities, requirements, location, and language needs. This needs to be in a human readible format, bullet point list for example, it wont be json.\n"
                         f"If your answer is no, say no summary in the summary json field.\n"
                         f"Note: If job content is unavailable or unclear, respond with 'yes'. For the summary you can say check by yourself.\n\n"
                         f"Respond in this exact JSON format:\n"
@@ -119,8 +124,9 @@ class Agent:
                         f"Job 1 (Title: {job['title']}):\n{job['content']}\n\nEnd of job."
                     )
 
-                    result = self.llm.generate_gemini_response(prompt)
-                    clean = re.sub(r'```(?:json)?\s*', '', result).replace('```', '')
+                    result = self.llm.generate_gemini_response(prompt, api_key=current_api_key)
+                    print(f"Job {idx + 1} done")
+                    clean = re.sub(r'```(?:json)?\s*','', result).replace('```', '')
                     match = re.search(r'\[.*\]', clean, re.DOTALL)
                     if not match:
                         raise ValueError("Response did not contain valid JSON list.")
@@ -134,17 +140,19 @@ class Agent:
                             "body": job["content"],
                             "job_sum": resp["summary"]
                         })
+                    ##print the answer and reason for each job
+                    print(f"Job {idx + 1} answer: \n {resp['answer']}, \n reason:\n {resp['reason']}")
                     break  # success
                 except Exception as e:
                     print(f"Retrying job {idx + 1} due to error: {e}")
-                    time.sleep(5)  # optional: avoid hammering the API
+                    self.llm.switch_to_next_key()
+                    print("Switched to the next API key.")
+                    #time.sleep(5)  # optional: avoid hammering the API
                     continue
 
         print(f"Filtered jobs: {len(filtered)}")
         return filtered
 
-    def linkedInPrompt(self, jobsInfo, user_pref,batch_size):
-
-        
+    def linkedInPrompt(self, jobsInfo, user_pref,batch_size):        
         filtered=self.prompt(jobsInfo,batch_size,user_pref)
         return filtered
