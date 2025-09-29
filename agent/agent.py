@@ -141,7 +141,7 @@ class Agent:
                             "job_sum": resp["summary"]
                         })
                     ##print the answer and reason for each job
-                    print(f"Job {idx + 1} answer: \n {resp['answer']}, \n reason:\n {resp['reason']}")
+                    print(f"Job {idx + 1} answer: \n {resp['answer']}, \n title: {resp['title']}, \n reason:\n {resp['reason']}")
                     break  # success
                 except Exception as e:
                     print(f"Retrying job {idx + 1} due to error: {e}")

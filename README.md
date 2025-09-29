@@ -1,6 +1,6 @@
 # Jobby - AI-Powered Job Hunting Assistant
 
-An intelligent job hunting assistant that utilizes AI to help you find opportunities, create customized CVs, and generate personalized motivational letters. See the demo, report and presentation for more details.
+An intelligent job hunting assistant that utilizes AI to help you find opportunities, create customized CVs, and generate personalized motivational letters.
 
 ## 🚀 Features
 

@@ -23,9 +23,14 @@ class xingDriver(Driver):
         time.sleep(20)  # Adjust sleep time as necessary
 
         # Wait for job cards to load
-        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.card-styles__CardLink-sc-cdebccb7-2.gHqAMw")))
-        job_links = self.driver.find_elements(By.CSS_SELECTOR, "a.card-styles__CardLink-sc-cdebccb7-2.gHqAMw")
-
+        wait.until(EC.presence_of_all_elements_located(
+            (By.CSS_SELECTOR, 'a[aria-label][href^="/jobs/"]')
+        ))
+        job_links = self.driver.find_elements(
+            By.CSS_SELECTOR, 'a[aria-label][href^="/jobs/"]'
+        )
+        print(f"Found {len(job_links)} job links.")
+        
         # Extract job titles and hrefs
         job_info_list = []
         for link in job_links:
