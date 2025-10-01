@@ -20,15 +20,22 @@ class xingDriver(Driver):
         wait = WebDriverWait(self.driver, 10)
 
         # Wait for the page to load
-        time.sleep(20)  # Adjust sleep time as necessary
+        time.sleep(50)  # Adjust sleep time as necessary
 
         # Wait for job cards to load
         wait.until(EC.presence_of_all_elements_located(
-            (By.CSS_SELECTOR, 'a[aria-label][href^="/jobs/"]')
+            (By.CSS_SELECTOR, 'a[aria-label][href]')
         ))
-        job_links = self.driver.find_elements(
-            By.CSS_SELECTOR, 'a[aria-label][href^="/jobs/"]'
-        )
+        links = self.driver.find_elements(By.CSS_SELECTOR, 'a[aria-label][href]')
+        job_links = []
+        for l in links:
+            href = (l.get_attribute("href") or "").strip()
+            if not href:
+                continue
+            if "https://www.xing.com/" in href.lower() and "job" not in href.lower():
+                continue
+            job_links.append(l)
+        
         print(f"Found {len(job_links)} job links.")
         
         # Extract job titles and hrefs
@@ -39,8 +46,13 @@ class xingDriver(Driver):
             if href:
                 job_info_list.append({"title": title, "url": href})
 
+        for job in job_info_list:
+            print(f"Job Title: {job['title']}, URL: {job['url']}")
+        
         results = []
         main_window = self.driver.current_window_handle
+  
+  
 
         for job in job_info_list:
             # Open in new tab
@@ -59,11 +71,15 @@ class xingDriver(Driver):
                 "url": job["url"],
                 "content": body
             })
-
+            
+            """
+            for result in results:
+                print(f"Job Title: {result['title']} \n, URL: {result['url']}\n, Content Snippet: {result['content'][:100]}...\n")
+            """
+                
             # Close new tab and return to main window
             self.driver.close()
             self.driver.switch_to.window(main_window)
-
         # Close main window
         self.driver.close()
         #print(results)

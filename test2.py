@@ -1,43 +1,39 @@
-from selenium import webdriver
+from backend.backend_tools.web_scrapping.driver import Driver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
-
-class JobScraper:
+class XingDriver(Driver):
     def __init__(self):
-        self.driver = webdriver.Chrome()
+        options = Options()
+        options.add_argument("--log-level=3")
+        super().__init__(options=options)
 
-    def get_blur_wrapper_text(self):
-        try:
-            # Wait until the specific div is present in the DOM
-            WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "div.description-module__BlurWrapper-sc-6acfc168-1.fLJwRE")
-                )
-            )
+    def printFilteredLinks(self, url):
+        self.getURL(url)
+        wait = WebDriverWait(self.driver, 10)
+        time.sleep(50)
+        links = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'a[aria-label][href]')))
+        kept = []
+        for l in links:
+            href = (l.get_attribute("href") or "").strip()
+            label = (l.get_attribute("aria-label") or "").strip()
+            if not href:
+                continue
+            if "https://www.xing.com/" in href.lower() and "job" not in href.lower():
+                continue
+            #print(label, "->", href)
+            kept.append({"label": label, "href": href})
+            
+        # print how many links were kept
+        print(f"Kept {len(kept)} relevant job links.")
+        # print which urls were removed
 
-            # Locate and return the text
-            element = self.driver.find_element(
-                By.CSS_SELECTOR, "div.description-module__BlurWrapper-sc-6acfc168-1.fLJwRE"
-            )
-            return element.text
+        self.driver.close()
+        return kept
 
-        except Exception as e:
-            return f"Failed to extract text: {e}"
+driver = XingDriver()
+driver.printFilteredLinks("https://www.xing.com/jobs/search?keywords=Werkstudent&location=Bonn&id=121067bff07394a5d92ce255fa4ee3a5&cityId=2946447.b8acbb&radius=100&careerLevel=1.795d28*2.24d1f6&sort=date&discipline=1011.6cf3f7*1007.b61d22*1022.ed6b40")
 
-    def scrape(self, url):
-        try:
-            self.driver.get(url)
-            return self.get_blur_wrapper_text()
-        finally:
-            self.driver.quit()
-
-
-# Example usage
-if __name__ == "__main__":
-    input_url = input("Enter the job post URL: ")
-    scraper = JobScraper()
-    content = scraper.scrape(input_url)
-    print("Extracted Text:\n", content)

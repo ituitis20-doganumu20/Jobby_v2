@@ -125,7 +125,7 @@ class Agent:
                     )
 
                     result = self.llm.generate_gemini_response(prompt, api_key=current_api_key)
-                    print(f"Job {idx + 1} done")
+                    print(f"Job {idx + 1} response: {result}")
                     clean = re.sub(r'```(?:json)?\s*','', result).replace('```', '')
                     match = re.search(r'\[.*\]', clean, re.DOTALL)
                     if not match:
@@ -140,8 +140,6 @@ class Agent:
                             "body": job["content"],
                             "job_sum": resp["summary"]
                         })
-                    ##print the answer and reason for each job
-                    print(f"Job {idx + 1} answer: \n {resp['answer']}, \n title: {resp['title']}, \n reason:\n {resp['reason']}")
                     break  # success
                 except Exception as e:
                     print(f"Retrying job {idx + 1} due to error: {e}")
