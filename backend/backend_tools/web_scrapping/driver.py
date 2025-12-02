@@ -20,7 +20,7 @@ class Driver:
 
     def getURL(self,url):
         self.driver.get(url)
-        time.sleep(2)
+        #time.sleep(2)
     def quit(self):
         self.driver.quit()
         

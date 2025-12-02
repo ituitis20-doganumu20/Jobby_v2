@@ -1,0 +1,19 @@
+2
+
+It seems to me when using Chrome the left element that requires scrolling can be controlled the same way as the whole window (also when I open LinkedIn via Safari the page is not divided and the main scroller of the window controls the left side).
+
+So after identifying the list of selenium elements - jobs_list
+
+python
+jobs_block= driver.find_element(By.CSS_SELECTOR, '.jobs-search-results__list')
+jobs_list= jobs_block.find_elements(By.CSS_SELECTOR, '.jobs-search-results__list-item')
+I iterated through the list using .execute_script to reveal new elements
+
+python
+n = 0
+for i in jobs_list:
+    print("__________")
+    n+=1
+    driver.execute_script("arguments[0].scrollIntoView();", jobs_list[n-1])
+    print(n, " ",i.text)
+It worked for me, hope it works for you and others who seek how to solve this. I am only partially satisfied with this solution as it still doesn't cover how to scroll the right side of the screen.

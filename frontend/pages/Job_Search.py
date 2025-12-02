@@ -25,7 +25,7 @@ st.header("Job Search")
 
 # Create a form
 with st.form(key="job_form"):
-    job_title = st.text_input("Enter Job Title")
+    linkedin_url = st.text_input("Enter LinkedIn Job Search URL")
     numberOfJobs = st.text_input("Enter Number Of Jobs")
     user_pref = st.text_area("Write your job preference for filtering (LinkedIn)")
     submit = st.form_submit_button(label="Submit")
@@ -36,9 +36,7 @@ if submit:
 
     agent = Agent()
     agent.specifyWebsite("linkedIn")
-    jobsInfo = agent.linkedInFilteredJobs(job_title,int(numberOfJobs))
-    prompt=agent.linkedInPrompt(jobsInfo,user_pref,5)
-    print(prompt)
+    prompt = agent.linkedInFilteredJobs(linkedin_url, int(numberOfJobs), user_pref)
     st.subheader("Matching LinkedIn Jobs:")
 
     if not prompt:

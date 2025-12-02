@@ -94,14 +94,14 @@ class Agent:
         filtered=self.prompt_one_by_one(jobs,user_pref)
         return filtered
 
-    def linkedInFilteredJobs(self,job_title,numberOfJobs):
-        
-        self.driver.insertJobTitle(job_title)
-        self.driver.getJobsPage()
-        urls = self.driver.getCompanyURLs(numberOfJobs)
-        jobInfo = self.driver.getJobInfo(urls) 
-
-        return jobInfo
+    def linkedInFilteredJobs(self, url, numberOfJobs, user_pref):
+        # self.driver.getURL(url)
+        # urls = self.driver.getCompanyURLs(numberOfJobs)
+        # jobInfo = self.driver.getJobInfo(urls)
+        # jobInfo = self.driver.getJobInfoFromPanel(numberOfJobs)
+        jobInfo = self.driver.getJobInfoWithJobId(url, numberOfJobs)
+        filtered_jobs = self.prompt_one_by_one(jobInfo, user_pref)
+        return filtered_jobs
     
     def prompt_one_by_one(self, jobsInfo, user_pref):
         print(f"Starting filtering")
@@ -114,14 +114,14 @@ class Agent:
 
                     prompt = (
                         f"You are an assistant helping a user find jobs based on their preference: '{user_pref}'.\n"
-                        f"For the job below, do two things:\n"
+                        f"For the job below, do these followin things:\n"
                         f"1. Say 'yes' or 'no' for whether the job matches the user's preference.\n"
-                        f"2. If 'yes', give a short bullet-point summary with important information like title, responsibilities, requirements, location, and language needs. This needs to be in a human readible format, bullet point list for example, it wont be json.\n"
+                        f"2. If 'yes', give a short bullet-point summary with important information like title, responsibilities, requirements, location, and language needs. This needs to be in a human readable format, bullet point list for example, it won't be JSON. An example summary:\n- **Job Title:** Student Trainee / Working Student in IT Operations\n- **Responsibilities:** Support operational IT procurement (licenses, hardware, SAP orders, communication), create/maintain application package data sheets, optimize device assignment in ServiceNow internationally, and assist with lifecycle management.\n- **Requirements:** Enrolled student (1+ year perspective), good knowledge of MS Office, Outlook, Teams, excellent communication skills, interest in IT, and good English skills.\n- **Location:** Leverkusen, NW, Germany (On-site).\n- **Language Needs:** Good English skills."
                         f"If your answer is no, say no summary in the summary json field.\n"
                         f"Note: If job content is unavailable or unclear, respond with 'yes'. For the summary you can say check by yourself.\n\n"
                         f"Respond in this exact JSON format:\n"
-                        f"[{{'job': 1, 'answer': 'yes'/'no', 'reason': '...', 'summary': '...'}}]\n\n"
-                        f"Job 1 (Title: {job['title']}):\n{job['content']}\n\nEnd of job."
+                        f"[{{'answer': 'yes'/'no', 'reason': '...', 'summary': '...'}}]\n\n"
+                        f"Job (Title: {job['title']}):\n{job['content']}\n\nEnd of job."
                     )
 
                     result = self.llm.generate_gemini_response(prompt, api_key=current_api_key)
@@ -149,8 +149,4 @@ class Agent:
                     continue
 
         print(f"Filtered jobs: {len(filtered)}")
-        return filtered
-
-    def linkedInPrompt(self, jobsInfo, user_pref,batch_size):        
-        filtered=self.prompt(jobsInfo,batch_size,user_pref)
         return filtered
