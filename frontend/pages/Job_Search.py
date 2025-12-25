@@ -36,13 +36,17 @@ if submit:
 
     agent = Agent()
     agent.specifyWebsite("linkedIn")
-    prompt = agent.linkedInFilteredJobs(linkedin_url, int(numberOfJobs), user_pref)
+    job_generator = agent.linkedInFilteredJobs(linkedin_url, int(numberOfJobs), user_pref)
     st.subheader("Matching LinkedIn Jobs:")
-
-    if not prompt:
+    
+    found_any = False
+    with st.container():
+        for job in job_generator:
+            found_any = True
+            display([job])
+            
+    if not found_any:
         st.info("No matching jobs found.")
-    else:
-        display(prompt)
 
 # XING Job Search Form
 with st.form(key="xing_form"):
@@ -54,11 +58,15 @@ if submit_xing:
     agent = Agent()
     agent.specifyWebsite("xing")
     
-    xing_results = agent.xingFilteredJobs(xing_url, user_pref)
+    xing_generator = agent.xingFilteredJobs(xing_url, user_pref)
 
     st.subheader("Matching Xing Jobs:")
 
-    if not xing_results:
+    found_any = False
+    with st.container():
+        for job in xing_generator:
+            found_any = True
+            display([job])
+
+    if not found_any:
         st.info("No matching jobs found.")
-    else:
-        display(xing_results)

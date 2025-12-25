@@ -109,7 +109,7 @@ class linkedInDriver(Driver):
                     self.driver.execute_script("arguments[0].scrollIntoView(true);", last_element)
                     
                     print("Waiting for new content to load after scroll...")
-                    #time.sleep(3)
+                    time.sleep(3)
                     
                     # Update for the next scroll check
                     last_element_count = current_element_count
@@ -130,7 +130,7 @@ class linkedInDriver(Driver):
                     print("Checking for 'Next' button...")
                     # Ensure the whole page is scrolled down to find the pagination controls
                     self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    #time.sleep(1)
+                    time.sleep(1)
                     
                     next_button = WebDriverWait(self.driver, 5).until(
                         EC.element_to_be_clickable((By.XPATH, "//button[./span[@class='artdeco-button__text' and text()='Next']]"))
@@ -138,7 +138,7 @@ class linkedInDriver(Driver):
                     if next_button.is_enabled():
                         print("Found and clicking 'Next' button.")
                         next_button.click()
-                        #time.sleep(3) # Wait for page to load after clicking next
+                        time.sleep(3) # Wait for page to load after clicking next
                         page_count += 1
                     else:
                         print("'Next' button found but not enabled. Assuming end of results.")
@@ -175,33 +175,23 @@ class linkedInDriver(Driver):
         return re.sub(r'\s+', ' ', ''.join(ans).replace("\n", ""))
         
     def getJobInfo(self,urls):
-       results = []
-       for url in urls:
-            self.getURL(url)
+        print("starting job scraping")
+        fails=0
+        results=[]
+        for url in urls:
+            try:
+                self.getURL(url)
+                c=self.driver.find_element(By.CLASS_NAME,"job-details-jobs-unified-top-card__company-name").text.strip()
+                ps=self.driver.find_elements(By.XPATH,"//div[@id='job-details']//p")
+                txt=''.join(p.get_attribute("outerHTML") for p in ps)
+                results.append({"title":c,"url":url,"content":self.removeTags(txt)})
+            except:
+                print("failed:",url)
+                fails+=1
+        print("failed count:",fails)
+        self.driver.close()
+        return results
 
-            # Locate the company name element
-            company_element = self.driver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__company-name")
-
-            # Extract company name text
-            company_name = company_element.text.strip()
-
-            #######################
-            # Find all <p> tags inside <div id="job-details">
-            p_tags = self.driver.find_elements(By.XPATH, "//div[@id='job-details']//p")
-
-            # Extract text content
-            #for p in p_tags:
-            txt=''.join(p.get_attribute("outerHTML") for p in p_tags)
-           
-            results.append({
-                "title": company_name,
-                "url": url,
-                "content": self.removeTags(txt)
-            })
-           
-           
-       self.driver.close()
-       return results
 
 
     def getJobInfoWithJobId(self, user_search_url, numberOfJobs):

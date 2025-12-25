@@ -103,10 +103,54 @@ class Agent:
         filtered_jobs = self.prompt_one_by_one(jobInfo, user_pref)
         return filtered_jobs
     
+    def get_history_file_path(self):
+        return os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'processed_jobs.json')
+
+    def load_processed_jobs(self):
+        file_path = self.get_history_file_path()
+        if not os.path.exists(file_path):
+            return {}
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                # Convert list to dict keyed by url for fast lookup
+                if isinstance(data, list):
+                     return {job['url']: job for job in data}
+                return data
+        except Exception:
+            return {}
+
+    def save_job_to_history(self, job_data):
+        file_path = self.get_history_file_path()
+        # Load current to ensure we don't overwrite if file changed externally (though unlikely here)
+        # For performance, we could rely on in-memory dict, but safety first.
+        current_data = self.load_processed_jobs()
+        current_data[job_data['url']] = job_data
+        
+        try:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(list(current_data.values()), f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            print(f"Error saving job to history: {e}")
+
     def prompt_one_by_one(self, jobsInfo, user_pref):
         print(f"Starting filtering")
-        filtered = []
+        processed_history = self.load_processed_jobs()
+        
         for idx, job in enumerate(jobsInfo):
+            if job['url'] in processed_history:
+                print(f"Skipping already processed job: {job['title']}")
+                saved_job = processed_history[job['url']]
+                if saved_job.get("is_match", False):
+                    yield {
+                        "title": saved_job["title"],
+                        "url": saved_job["url"],
+                        "reason": saved_job.get("reason"),
+                        "body": saved_job.get("body"),
+                        "job_sum": saved_job.get("job_sum")
+                    }
+                continue
+
             while True:
                 try:
                     # Get the current API key
@@ -125,28 +169,39 @@ class Agent:
                     )
 
                     result = self.llm.generate_gemini_response(prompt, api_key=current_api_key)
-                    print(f"Job {idx + 1} response: {result}")
+                    print(f"Job {idx + 1} Link: {job['url']} \n response: {result}")
                     clean = re.sub(r'```(?:json)?\s*','', result).replace('```', '')
                     match = re.search(r'\[.*\]', clean, re.DOTALL)
                     if not match:
                         raise ValueError("Response did not contain valid JSON list.")
 
                     resp = json.loads(match.group(0))[0]
-                    if resp["answer"].lower() == "yes":
-                        filtered.append({
-                            "title": job["title"],
-                            "url": job["url"],
-                            "reason": resp["reason"],
-                            "body": job["content"],
-                            "job_sum": resp["summary"]
-                        })
+                    is_match = resp["answer"].lower() == "yes"
+                    
+                    job_result_data = {
+                        "title": job["title"],
+                        "url": job["url"],
+                        "reason": resp["reason"],
+                        "body": job["content"],
+                        "job_sum": resp["summary"],
+                        "is_match": is_match
+                    }
+                    
+                    self.save_job_to_history(job_result_data)
+
+                    if is_match:
+                        yield job_result_data
                     break  # success
                 except Exception as e:
                     print(f"Retrying job {idx + 1} due to error: {e}")
+                    if "429" in str(e):
+                        # Try to find 'seconds: <number>' in the error message
+                        match_wait = re.search(r'seconds:\s*(\d+)', str(e))
+                        wait_time = (int(match_wait.group(1)) + 1) if match_wait else 15
+                        print(f"Rate limit reached (429). Waiting for {wait_time} seconds...")
+                        time.sleep(wait_time)
                     self.llm.switch_to_next_key()
                     print("Switched to the next API key.")
-                    #time.sleep(5)  # optional: avoid hammering the API
                     continue
 
-        print(f"Filtered jobs: {len(filtered)}")
-        return filtered
+        print("All jobs have been processed.")
